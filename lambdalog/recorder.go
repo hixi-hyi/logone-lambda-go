@@ -46,7 +46,12 @@ func (r *Recorder) Start() func() {
 }
 func (r *Recorder) Finish() {
 	r.LogRequest.Runtime.Finish(r.SeverityCount.HighestSeverity())
-	logline, _ := json.Marshal(r.LogRequest)
+	var logline []byte
+	if r.Config.JsonIndent {
+		logline, _ = json.MarshalIndent(r.LogRequest, "", "  ")
+	} else {
+		logline, _ := json.Marshal(r.LogRequest)
+	}
 	fmt.Println(string(logline))
 }
 
