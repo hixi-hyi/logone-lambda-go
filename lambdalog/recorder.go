@@ -8,17 +8,13 @@ import (
 	"time"
 )
 
-type RecorderConfig struct {
-	*ManagerConfig
-}
-
 type Recorder struct {
-	Config        *RecorderConfig
+	Config        *Config
 	LogRequest    *LogRequest
 	SeverityCount *SeverityCount
 }
 
-func NewRecorder(ctx context.Context, c *RecorderConfig) *Recorder {
+func NewRecorder(ctx context.Context, c *Config) *Recorder {
 	lr := &LogRequest{
 		Type:    c.Type,
 		Context: NewLogContext(ctx),
@@ -34,12 +30,12 @@ func NewRecorder(ctx context.Context, c *RecorderConfig) *Recorder {
 }
 
 func NewRecorderDefault(ctx context.Context) *Recorder {
-	mc := &ManagerConfig{
+	c := &Config{
 		Type:            "request",
 		DefaultSeverity: SeverityDebug,
 		OutputSeverity:  SeverityDebug,
 	}
-	return NewRecorder(ctx, &RecorderConfig{mc})
+	return NewRecorder(ctx, c)
 }
 
 func (r *Recorder) Start() func() {

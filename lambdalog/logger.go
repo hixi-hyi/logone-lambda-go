@@ -2,22 +2,23 @@ package lambdalog
 
 import "context"
 
-type ManagerConfig struct {
+type Config struct {
 	Type            string
 	DefaultSeverity Severity
 	OutputSeverity  Severity
+	JsonIndent      bool
 }
 
 type Manager struct {
-	Config *ManagerConfig
+	Config *Config
 }
 
-func NewManager(mc *ManagerConfig) *Manager {
+func NewManager(mc *Config) *Manager {
 	return &Manager{mc}
 }
 
 func NewManagerDefault() *Manager {
-	mc := &ManagerConfig{
+	mc := &Config{
 		Type:            "request",
 		DefaultSeverity: SeverityDebug,
 		OutputSeverity:  SeverityDebug,
@@ -26,7 +27,7 @@ func NewManagerDefault() *Manager {
 }
 
 func (m *Manager) Recording(ctx context.Context) (*Recorder, func()) {
-	r := NewRecorder(ctx, &RecorderConfig{m.Config})
+	r := NewRecorder(ctx, m.Config)
 	return r, func() {
 		r.Finish()
 	}
