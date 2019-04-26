@@ -50,7 +50,7 @@ func (r *Recorder) Finish() {
 	if r.Config.JsonIndent {
 		logline, _ = json.MarshalIndent(r.LogRequest, "", "  ")
 	} else {
-		logline, _ := json.Marshal(r.LogRequest)
+		logline, _ = json.Marshal(r.LogRequest)
 	}
 	fmt.Println(string(logline))
 }
