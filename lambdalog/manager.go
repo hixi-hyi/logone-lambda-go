@@ -36,13 +36,12 @@ func NewManagerDefault() *Manager {
 
 func (m *Manager) Recording(ctx context.Context) (*Logger, func()) {
 	r := NewLogger(ctx, m.Config)
-	return r, func() {
-		r.Finish()
-	}
+	flush := r.Start()
+	return r, flush
 }
 
 func (m *Manager) RecordingInContext(ctx context.Context) (context.Context, func()) {
-	l, write := m.Recording(ctx)
+	l, flush := m.Recording(ctx)
 	nctx := NewContextWithLogger(ctx, l)
-	return nctx, write
+	return nctx, flush
 }
