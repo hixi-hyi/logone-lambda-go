@@ -57,7 +57,7 @@ manager = lambdalog.NewManager(&lambdalog.Config{
 
 ### With Attributes And Type
 You can add the anotation to log.
-The `Attributes` value must be defined as a type that can be JSON.Marshal.
+The `Attributes` value must be defined as a type that can be JSON.Marshal. If you want to output value that cannot be JSON.Marshal, you use fmt.Sprintf or primitive type. (e.g. error is not struct or primitive type, you must use fmt.Sprintf("%s", err) or err.Error())
 ```
 res, err := sns.Publish(params)
 if err != nil {
@@ -76,3 +76,4 @@ log.Info("publish successfully).WithArrtibutes(res)
 * Support to OutputSeverity in lambdalog.Config. It is print all logs now.
 * Support to DefaultSeverity in lambdalog.Config. It is "UNKNOWN" now, if you don't write a any log.
 * Support to OutputColumns in lambdalog.Config. Now is `RFILENAME | RFILELINE | RFUNCNAME | CELAPSED_UNIT` now.
+* Do not want to consider about Attributes limitation. Now Attributes is support to only type can be JSON.Marshal or primitive.
