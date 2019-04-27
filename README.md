@@ -75,5 +75,5 @@ log.Info("publish successfully).WithArrtibutes(res)
 * Support to OutputFunc in lambdalog.Config. It is fmt.Println() now.
 * Support to OutputSeverity in lambdalog.Config. It is print all logs now.
 * Support to DefaultSeverity in lambdalog.Config. It is "UNKNOWN" now, if you don't write a any log.
-* Support to OutputColumns in lambdalog.Config. Now is `RFILENAME | RFILELINE | RFUNCNAME | CELAPSED_UNIT` now.
-* Do not want to consider about Attributes limitation. Now Attributes is support to only type can be JSON.Marshal or primitive.
+* Support to OutputColumns in lambdalog.Config. It is `RFILENAME | RFILELINE | RFUNCNAME | CELAPSED_UNIT` now.
+* Do not want to consider about Attributes limitation. Attributes is support to only type can be JSON.Marshal or primitive now.
