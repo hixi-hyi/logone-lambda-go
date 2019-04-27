@@ -1,4 +1,6 @@
 # logone-lambda-go
 
+The library support by structured loggging for aws-lambda.
+
+
 ## Caution
-Now the package is experimental implementation
