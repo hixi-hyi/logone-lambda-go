@@ -9,15 +9,15 @@ import (
 )
 
 type LogEntry struct {
-	Severity      string      `json:"severity"`
-	Message       string      `json:"message"`
-	Time          time.Time   `json:"time,omitempty"`
-	Filename      string      `json:"filename"`
-	Fileline      int         `json:"fileline"`
-	Funcname      string      `json:"funcname"`
-	Type          string      `json:"type,omitempty"`
-	ElapsedInNano float64     `json:"elapsedInNano,omitempty"`
-	Attributes    interface{} `json:"attributes,omitempty"`
+	Severity   string      `json:"severity"`
+	Message    string      `json:"message"`
+	Time       time.Time   `json:"time,omitempty"`
+	Filename   string      `json:"filename"`
+	Fileline   int         `json:"fileline"`
+	Funcname   string      `json:"funcname"`
+	Type       string      `json:"type,omitempty"`
+	Elapsed    float64     `json:"elapsed,omitempty"`
+	Attributes interface{} `json:"attributes,omitempty"`
 }
 
 func (lr *LogEntry) WithType(s string) *LogEntry {
@@ -34,25 +34,20 @@ type LogRequest struct {
 	Type    string      `json:"type"`
 	Context *LogContext `json:"context"`
 	Runtime *LogRuntime `json:"runtime"`
+	Config  *LogConfig  `json:"config"`
 	//Extras  interface{}       `json:"extras,omitempty"`
 }
 
+type LogConfig struct {
+	ElapsedUnit string `json:"elapsedUnit"`
+}
+
 type LogRuntime struct {
-	Severity      string      `json:"severity"`
-	StartTime     time.Time   `json:"startTime"`
-	EndTime       time.Time   `json:"endTime"`
-	ElapsedInNano int64       `json:"elapsedInNano"`
-	Lines         []*LogEntry `json:"lines,omitempty"`
-}
-
-func (lr *LogRuntime) Start() {
-	lr.StartTime = time.Now()
-}
-
-func (lr *LogRuntime) Finish(severity Severity) {
-	lr.EndTime = time.Now()
-	lr.ElapsedInNano = lr.EndTime.Sub(lr.StartTime).Nanoseconds()
-	lr.Severity = severity.String()
+	Severity  string      `json:"severity"`
+	StartTime time.Time   `json:"startTime"`
+	EndTime   time.Time   `json:"endTime"`
+	Elapsed   int64       `json:"elapsed"`
+	Lines     []*LogEntry `json:"lines,omitempty"`
 }
 
 func (lr *LogRuntime) AppendLogEntry(l *LogEntry) {

@@ -19,6 +19,9 @@ func NewRecorder(ctx context.Context, c *Config) *Recorder {
 		Type:    c.Type,
 		Context: NewLogContext(ctx),
 		Runtime: &LogRuntime{},
+		Config: &LogConfig{
+			ElapsedUnit: c.ElapsedUnit.String(),
+		},
 	}
 
 	r := &Recorder{
@@ -30,22 +33,23 @@ func NewRecorder(ctx context.Context, c *Config) *Recorder {
 }
 
 func NewRecorderDefault(ctx context.Context) *Recorder {
-	c := &Config{
-		Type:            "request",
-		DefaultSeverity: SeverityDebug,
-		OutputSeverity:  SeverityDebug,
-	}
+	c := NewConfigDefault()
 	return NewRecorder(ctx, c)
 }
 
 func (r *Recorder) Start() func() {
-	r.LogRequest.Runtime.Start()
+	lr := r.LogRequest.Runtime
+	lr.StartTime = time.Now()
 	return func() {
 		r.Finish()
 	}
 }
 func (r *Recorder) Finish() {
-	r.LogRequest.Runtime.Finish(r.SeverityCount.HighestSeverity())
+	lr := r.LogRequest.Runtime
+	lr.EndTime = time.Now()
+	elapsed := lr.EndTime.Sub(lr.StartTime)
+	lr.Elapsed = int64(elapsed / r.Config.ElapsedUnit)
+	lr.Severity = r.SeverityCount.HighestSeverity().String()
 	var logline []byte
 	if r.Config.JsonIndent {
 		logline, _ = json.MarshalIndent(r.LogRequest, "", "  ")

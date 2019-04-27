@@ -1,16 +1,29 @@
 package lambdalog
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Config struct {
 	Type            string
 	DefaultSeverity Severity
 	OutputSeverity  Severity
 	JsonIndent      bool
+	ElapsedUnit     time.Duration
 }
 
 type Manager struct {
 	Config *Config
+}
+
+func NewConfigDefault() *Config {
+	return &Config{
+		Type:            "request",
+		DefaultSeverity: SeverityDebug,
+		OutputSeverity:  SeverityDebug,
+		ElapsedUnit:     time.Millisecond,
+	}
 }
 
 func NewManager(mc *Config) *Manager {
@@ -18,12 +31,7 @@ func NewManager(mc *Config) *Manager {
 }
 
 func NewManagerDefault() *Manager {
-	mc := &Config{
-		Type:            "request",
-		DefaultSeverity: SeverityDebug,
-		OutputSeverity:  SeverityDebug,
-	}
-	return NewManager(mc)
+	return NewManager(NewConfigDefault())
 }
 
 func (m *Manager) Recording(ctx context.Context) (*Recorder, func()) {
@@ -31,4 +39,10 @@ func (m *Manager) Recording(ctx context.Context) (*Recorder, func()) {
 	return r, func() {
 		r.Finish()
 	}
+}
+
+func (m *Manager) RecordingInContext(ctx context.Context) (context.Context, func()) {
+	r, write := m.Recording(ctx)
+	nctx := NewContextWithRecorder(ctx, r)
+	return nctx, write
 }
