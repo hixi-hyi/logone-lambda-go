@@ -9,6 +9,8 @@ Be careful with memory usage when using it on a huge system.
 ## Usage
 ### Simple lambda
 ```
+import github.com/hixi-hyi/logone-lambda-go/lambdalog
+
 var manager *lambdalog.Manager
 func init() {
     manager = lambdalog.NewManagerDefault()
@@ -32,7 +34,6 @@ You can change the some parameters.
 manager = lambdalog.NewManager(&lambdalog.Config{
 	Type:            "request",
 	DefaultSeverity: lambdalog.SeverityDebug,
-	OutputSeverity:  lambdalog.SeverityDebug,
 	ElapsedUnit:     time.Millisecond,
 	JsonIndent:      false
 })
@@ -45,8 +46,16 @@ res, err := sns.Publish(params)
 if err != nil {
     log.Error("error occured in sns.Publish: %s", err).WithType("aws-sdk-error")
     // {"severity":"ERROR","message":"error occured in sns.Publish: xxxx","time":"2019-04-27T20:12:20.5370358Z","filename":"/yourcode/main.go","fileline":80,"funcname":"main.handler"}
+    return err
 }
 log.Info("publish successfully).WithArrtibutes(res)
 // {"severity":"INFO","message":"publish successfully","time":"2019-04-27T20:28:05.8390507Z","filename":"/yourcode/main.go", "fileline":81,"funcname":"main.handler","attributes":{"MessageId":"xxxxxx"}}
 
 ```
+
+## ToDo
+* godoc
+* Support to OutputFunc in lambdalog.Config. It is fmt.Println() now.
+* Support to OutputSeverity in lambdalog.Config. It is print all logs now.
+* Support to DefaultSeverity in lambdalog.Config. It is "UNKNOWN" now, if you don't write a any log.
+* Support to OutputColumns in lambdalog.Config. Now is `RFILENAME | RFILELINE | RFUNCNAME | CELAPSED_UNIT` now.
