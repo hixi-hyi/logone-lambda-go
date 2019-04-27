@@ -4,10 +4,12 @@ CloudWatch Logs is also support to JSON format, so you will be easier to investi
 
 ## Caution
 Log messages are temporarily stored in memory.
-Be careful with memory usage when using it on a huge system.
+Be careful in below point on a huge system.
+* Memory usage.
+* The log is not written out until the function ends.
 
 ## Usage
-### Simple lambda
+### Simple Example
 ```
 import github.com/hixi-hyi/logone-lambda-go/lambdalog
 
@@ -28,6 +30,20 @@ func handler(ctx context.Context, req events.CloudWatchEvent) (interface{}, erro
 // {"type":"request","context":{"functionName":"test","functionVersion":"$LATEST","memoryLimitInMega":128,"invokedFunctionArn":"arn:aws:lambda:ap-northeast-1:123456789:function:test","awsRequestId":"b609c7aa-8b33-181f-70a8-b0d4d44b31f1"},"runtime":{"severity":"INFO","startTime":"2019-04-27T20:12:20.5258606Z","endTime":"2019-04-27T20:12:20.5370457Z","elapsed":11,"lines":[{"severity":"INFO","message":"test","time":"2019-04-27T20:12:20.5370358Z","filename":"/yourcode/main.go","fileline":80,"funcname":"main.handler"}]},"config":{"elapsedUnit":"1ms"}}
 ```
 
+### Using nested function
+```
+func handler(ctx context.Context, req events.CloudWatchEvent) (interface{}, error) {
+    log, flush := manager.Recording(ctx)
+    defer flush()
+    ctx = lambdalog.NewContextWithLogger(ctx)
+    func2(ctx)
+    return nil, nil
+}
+func func2(ctx context.Context) {
+    log := lambdalog.LoggerFromContext(ctx)
+}
+```
+
 ### With Config
 You can change the some parameters.
 ```
@@ -38,6 +54,7 @@ manager = lambdalog.NewManager(&lambdalog.Config{
 	JsonIndent:      false
 })
 ```
+
 ### With Attributes And Type
 You can add the anotation to log.
 The `Attributes` value must be defined as a type that can be JSON.Marshal.
