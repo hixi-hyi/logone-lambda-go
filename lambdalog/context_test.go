@@ -19,9 +19,9 @@ func TestContext(t *testing.T) {
 			InvokedFunctionArn: "dummyarn",
 		}
 		ctx = lambdacontext.NewContext(ctx, lc)
-		r := NewRecorderDefault(Context())
-		ctx = NewContextWithRecorder(ctx, r)
-		nr, ok := RecorderFromContext(ctx)
+		r := NewLoggerDefault(Context())
+		ctx = NewContextWithLogger(ctx, r)
+		nr, ok := LoggerFromContext(ctx)
 		assert.Exactly(t, true, ok)
 		assert.Exactly(t, r, nr)
 	})

@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-type Recorder struct {
+type Logger struct {
 	Config        *Config
 	LogRequest    *LogRequest
 	SeverityCount *SeverityCount
 }
 
-func NewRecorder(ctx context.Context, c *Config) *Recorder {
+func NewLogger(ctx context.Context, c *Config) *Logger {
 	lr := &LogRequest{
 		Type:    c.Type,
 		Context: NewLogContext(ctx),
@@ -24,7 +24,7 @@ func NewRecorder(ctx context.Context, c *Config) *Recorder {
 		},
 	}
 
-	r := &Recorder{
+	r := &Logger{
 		Config:        c,
 		LogRequest:    lr,
 		SeverityCount: &SeverityCount{},
@@ -32,19 +32,19 @@ func NewRecorder(ctx context.Context, c *Config) *Recorder {
 	return r
 }
 
-func NewRecorderDefault(ctx context.Context) *Recorder {
+func NewLoggerDefault(ctx context.Context) *Logger {
 	c := NewConfigDefault()
-	return NewRecorder(ctx, c)
+	return NewLogger(ctx, c)
 }
 
-func (r *Recorder) Start() func() {
+func (r *Logger) Start() func() {
 	lr := r.LogRequest.Runtime
 	lr.StartTime = time.Now()
 	return func() {
 		r.Finish()
 	}
 }
-func (r *Recorder) Finish() {
+func (r *Logger) Finish() {
 	lr := r.LogRequest.Runtime
 	lr.EndTime = time.Now()
 	elapsed := lr.EndTime.Sub(lr.StartTime)
@@ -59,7 +59,7 @@ func (r *Recorder) Finish() {
 	fmt.Println(string(logline))
 }
 
-func (r *Recorder) Record(severity Severity, message string) *LogEntry {
+func (r *Logger) Record(severity Severity, message string) *LogEntry {
 	funcname, filename, fileline := FileInfo(3)
 	e := &LogEntry{
 		Severity: severity.String(),
@@ -74,19 +74,19 @@ func (r *Recorder) Record(severity Severity, message string) *LogEntry {
 	return e
 }
 
-func (r *Recorder) Debug(f string, v ...interface{}) *LogEntry {
+func (r *Logger) Debug(f string, v ...interface{}) *LogEntry {
 	return r.Record(SeverityDebug, fmt.Sprintf(f, v...))
 }
-func (r *Recorder) Info(f string, v ...interface{}) *LogEntry {
+func (r *Logger) Info(f string, v ...interface{}) *LogEntry {
 	return r.Record(SeverityInfo, fmt.Sprintf(f, v...))
 }
-func (r *Recorder) Warning(f string, v ...interface{}) *LogEntry {
+func (r *Logger) Warning(f string, v ...interface{}) *LogEntry {
 	return r.Record(SeverityWarning, fmt.Sprintf(f, v...))
 }
-func (r *Recorder) Error(f string, v ...interface{}) *LogEntry {
+func (r *Logger) Error(f string, v ...interface{}) *LogEntry {
 	return r.Record(SeverityError, fmt.Sprintf(f, v...))
 }
-func (r *Recorder) Critical(f string, v ...interface{}) *LogEntry {
+func (r *Logger) Critical(f string, v ...interface{}) *LogEntry {
 	return r.Record(SeverityCritical, fmt.Sprintf(f, v...))
 }
 

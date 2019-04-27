@@ -6,11 +6,11 @@ type key struct{}
 
 var contextKey = &key{}
 
-func NewContextWithRecorder(parent context.Context, r *Recorder) context.Context {
+func NewContextWithLogger(parent context.Context, r *Logger) context.Context {
 	return context.WithValue(parent, contextKey, r)
 }
 
-func RecorderFromContext(ctx context.Context) (*Recorder, bool) {
-	r, ok := ctx.Value(contextKey).(*Recorder)
+func LoggerFromContext(ctx context.Context) (*Logger, bool) {
+	r, ok := ctx.Value(contextKey).(*Logger)
 	return r, ok
 }
