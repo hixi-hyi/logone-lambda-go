@@ -42,7 +42,7 @@ func (m *Manager) Recording(ctx context.Context) (*Logger, func()) {
 }
 
 func (m *Manager) RecordingInContext(ctx context.Context) (context.Context, func()) {
-	r, write := m.Recording(ctx)
-	nctx := NewContextWithLogger(ctx, r)
+	l, write := m.Recording(ctx)
+	nctx := NewContextWithLogger(ctx, l)
 	return nctx, write
 }

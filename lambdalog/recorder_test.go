@@ -22,9 +22,9 @@ func Context() context.Context {
 
 func TestLogger(t *testing.T) {
 	t.Run("scenario", func(t *testing.T) {
-		r := NewLoggerDefault(Context())
-		finish := r.Start()
-		r.Debug("%s", "a")
+		l := NewLoggerDefault(Context())
+		finish := l.Start()
+		l.Debug("%s", "a")
 		finish()
 	})
 

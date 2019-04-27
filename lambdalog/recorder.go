@@ -24,12 +24,12 @@ func NewLogger(ctx context.Context, c *Config) *Logger {
 		},
 	}
 
-	r := &Logger{
+	l := &Logger{
 		Config:        c,
 		LogRequest:    lr,
 		SeverityCount: &SeverityCount{},
 	}
-	return r
+	return l
 }
 
 func NewLoggerDefault(ctx context.Context) *Logger {
@@ -37,29 +37,29 @@ func NewLoggerDefault(ctx context.Context) *Logger {
 	return NewLogger(ctx, c)
 }
 
-func (r *Logger) Start() func() {
-	lr := r.LogRequest.Runtime
+func (l *Logger) Start() func() {
+	lr := l.LogRequest.Runtime
 	lr.StartTime = time.Now()
 	return func() {
-		r.Finish()
+		l.Finish()
 	}
 }
-func (r *Logger) Finish() {
-	lr := r.LogRequest.Runtime
+func (l *Logger) Finish() {
+	lr := l.LogRequest.Runtime
 	lr.EndTime = time.Now()
 	elapsed := lr.EndTime.Sub(lr.StartTime)
-	lr.Elapsed = int64(elapsed / r.Config.ElapsedUnit)
-	lr.Severity = r.SeverityCount.HighestSeverity().String()
+	lr.Elapsed = int64(elapsed / l.Config.ElapsedUnit)
+	lr.Severity = l.SeverityCount.HighestSeverity().String()
 	var logline []byte
-	if r.Config.JsonIndent {
-		logline, _ = json.MarshalIndent(r.LogRequest, "", "  ")
+	if l.Config.JsonIndent {
+		logline, _ = json.MarshalIndent(l.LogRequest, "", "  ")
 	} else {
-		logline, _ = json.Marshal(r.LogRequest)
+		logline, _ = json.Marshal(l.LogRequest)
 	}
 	fmt.Println(string(logline))
 }
 
-func (r *Logger) Record(severity Severity, message string) *LogEntry {
+func (l *Logger) Record(severity Severity, message string) *LogEntry {
 	funcname, filename, fileline := FileInfo(3)
 	e := &LogEntry{
 		Severity: severity.String(),
@@ -69,25 +69,25 @@ func (r *Logger) Record(severity Severity, message string) *LogEntry {
 		Fileline: fileline,
 		Funcname: funcname,
 	}
-	r.LogRequest.Runtime.AppendLogEntry(e)
-	r.SeverityCount.CountUp(severity)
+	l.LogRequest.Runtime.AppendLogEntry(e)
+	l.SeverityCount.CountUp(severity)
 	return e
 }
 
-func (r *Logger) Debug(f string, v ...interface{}) *LogEntry {
-	return r.Record(SeverityDebug, fmt.Sprintf(f, v...))
+func (l *Logger) Debug(f string, v ...interface{}) *LogEntry {
+	return l.Record(SeverityDebug, fmt.Sprintf(f, v...))
 }
-func (r *Logger) Info(f string, v ...interface{}) *LogEntry {
-	return r.Record(SeverityInfo, fmt.Sprintf(f, v...))
+func (l *Logger) Info(f string, v ...interface{}) *LogEntry {
+	return l.Record(SeverityInfo, fmt.Sprintf(f, v...))
 }
-func (r *Logger) Warning(f string, v ...interface{}) *LogEntry {
-	return r.Record(SeverityWarning, fmt.Sprintf(f, v...))
+func (l *Logger) Warning(f string, v ...interface{}) *LogEntry {
+	return l.Record(SeverityWarning, fmt.Sprintf(f, v...))
 }
-func (r *Logger) Error(f string, v ...interface{}) *LogEntry {
-	return r.Record(SeverityError, fmt.Sprintf(f, v...))
+func (l *Logger) Error(f string, v ...interface{}) *LogEntry {
+	return l.Record(SeverityError, fmt.Sprintf(f, v...))
 }
-func (r *Logger) Critical(f string, v ...interface{}) *LogEntry {
-	return r.Record(SeverityCritical, fmt.Sprintf(f, v...))
+func (l *Logger) Critical(f string, v ...interface{}) *LogEntry {
+	return l.Record(SeverityCritical, fmt.Sprintf(f, v...))
 }
 
 func FileInfo(depth int) (string, string, int) {
