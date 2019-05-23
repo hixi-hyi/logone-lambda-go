@@ -1,6 +1,6 @@
 # logone-lambda-go
 The library is support to structured logging using JSON format for aws-lambda.
-CloudWatch Logs is also support to JSON format, so you will be easier to investigate a log.
+CloudWatch Logs is support to JSON format, you will be easier to investigate a log.
 
 ## Caution
 Log messages are temporarily stored in memory.
@@ -55,19 +55,22 @@ manager = lambdalog.NewManager(&lambdalog.Config{
 })
 ```
 
-### With Attributes And Type
-You can add the anotation to log.
-The `Attributes` value must be defined as a type that can be JSON.Marshal. If you want to output value that cannot be JSON.Marshal, you use fmt.Sprintf or primitive type. (e.g. error is not struct or primitive type, you must use fmt.Sprintf("%s", err) or err.Error())
+### With Type
+You can add annotations to investigate the log.
 ```
 res, err := sns.Publish(params)
 if err != nil {
     log.Error("error occured in sns.Publish: %s", err).WithType("aws-sdk-error")
-    // {"severity":"ERROR","message":"error occured in sns.Publish: xxxx","time":"2019-04-27T20:12:20.5370358Z","filename":"/yourcode/main.go","fileline":80,"funcname":"main.handler"}
+    // {"severity":"ERROR","message":"error occured in sns.Publish: xxxx","time":"2019-04-27T20:12:20.5370358Z","filename":"/yourcode/main.go","fileline":80,"funcname":"main.handler","type": "aws-sdk-error"}
     return err
 }
+```
+### With Attributes
+You can add an annotation to the log to get more details.
+The `Attributes` value must be defined as a type that can be JSON.Marshal. If you want to output value that cannot be JSON.Marshal, you use fmt.Sprintf or primitive type. (e.g. error is not struct or primitive type, you must use fmt.Sprintf("%s", err) or err.Error())
+```
 log.Info("publish successfully).WithArrtibutes(res)
 // {"severity":"INFO","message":"publish successfully","time":"2019-04-27T20:28:05.8390507Z","filename":"/yourcode/main.go", "fileline":81,"funcname":"main.handler","attributes":{"MessageId":"xxxxxx"}}
-
 ```
 
 ## ToDo
