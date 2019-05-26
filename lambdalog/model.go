@@ -13,9 +13,9 @@ type LogEntry struct {
 	Severity   Severity    `json:"severity"`
 	Message    string      `json:"message"`
 	Time       time.Time   `json:"time,omitempty"`
-	Filename   string      `json:"filename"`
-	Fileline   int         `json:"fileline"`
-	Funcname   string      `json:"funcname"`
+	Filename   string      `json:"filename,omitempty"`
+	Fileline   int         `json:"fileline,omitempty"`
+	Funcname   string      `json:"funcname,omitempty"`
 	Tags       []string    `json:"tags,omitempty"`
 	Elapsed    float64     `json:"elapsed,omitempty"`
 	Attributes interface{} `json:"attributes,omitempty"`
