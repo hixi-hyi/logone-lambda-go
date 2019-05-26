@@ -99,9 +99,11 @@ func (l *Logger) Critical(f string, v ...interface{}) *LogEntry {
 }
 
 func FileInfo(depth int) (string, string, int) {
-	pc, filename, fileline, ok := runtime.Caller(depth)
+	pc, _, _, ok := runtime.Caller(depth)
 	if !ok {
 		return "???", "???", 0
 	}
-	return runtime.FuncForPC(pc).Name(), filename, fileline
+	fn := runtime.FuncForPC(pc)
+	filename, fileline := fn.FileLine(pc)
+	return fn.Name(), filename, fileline
 }
