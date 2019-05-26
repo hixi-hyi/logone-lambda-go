@@ -2,6 +2,7 @@ package lambdalog
 
 import (
 	"context"
+	"encoding/json"
 	"sort"
 	"time"
 
@@ -9,19 +10,19 @@ import (
 )
 
 type LogEntry struct {
-	Severity   string      `json:"severity"`
+	Severity   Severity    `json:"severity"`
 	Message    string      `json:"message"`
 	Time       time.Time   `json:"time,omitempty"`
 	Filename   string      `json:"filename"`
 	Fileline   int         `json:"fileline"`
 	Funcname   string      `json:"funcname"`
-	Type       string      `json:"type,omitempty"`
+	Tags       []string    `json:"tags,omitempty"`
 	Elapsed    float64     `json:"elapsed,omitempty"`
 	Attributes interface{} `json:"attributes,omitempty"`
 }
 
-func (lr *LogEntry) WithType(s string) *LogEntry {
-	lr.Type = s
+func (lr *LogEntry) WithTags(tags ...string) *LogEntry {
+	lr.Tags = tags
 	return lr
 }
 
@@ -43,11 +44,20 @@ type LogConfig struct {
 }
 
 type LogRuntime struct {
-	Severity  string      `json:"severity"`
-	StartTime time.Time   `json:"startTime"`
-	EndTime   time.Time   `json:"endTime"`
-	Elapsed   int64       `json:"elapsed"`
-	Lines     []*LogEntry `json:"lines,omitempty"`
+	Severity   Severity      `json:"severity"`
+	StartTime  time.Time     `json:"startTime"`
+	EndTime    time.Time     `json:"endTime"`
+	Elapsed    int64         `json:"elapsed"`
+	Lines      []*LogEntry   `json:"lines,omitempty"`
+	Tags       LogTags       `json:"tags,omitempty"`
+	Severities SeverityCount `json:"-"`
+}
+
+func NewLogRuntime() *LogRuntime {
+	lr := &LogRuntime{}
+	lr.Tags = LogTags{}
+	lr.Severities = SeverityCount{}
+	return lr
 }
 
 func (lr *LogRuntime) AppendLogEntry(l *LogEntry) {
@@ -76,6 +86,14 @@ func NewLogContext(ctx context.Context) *LogContext {
 	return lc
 }
 
+type LogTags map[string]int64
+
+func (lt LogTags) CountUp(tags ...string) {
+	for _, t := range tags {
+		lt[t] += 1
+	}
+}
+
 type Severity int
 
 const (
@@ -100,6 +118,10 @@ func (s Severity) String() string {
 		return v
 	}
 	return "UNKNOWN"
+}
+
+func (s Severity) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.String())
 }
 
 type SeverityCount map[Severity]int64

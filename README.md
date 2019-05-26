@@ -3,6 +3,7 @@ The library is support to structured logging using JSON format for aws-lambda.
 CloudWatch Logs is support to JSON format, you will be easier to investigate a log.
 
 ## Caution
+It's experimental version.
 Log messages are temporarily stored in memory.
 Be careful in below point on a huge system.
 * Memory usage.
@@ -55,13 +56,14 @@ manager = lambdalog.NewManager(&lambdalog.Config{
 })
 ```
 
-### With Type
+### With Tags
 You can add annotations to investigate the log.
+If you want to investigate the tag, you can get logs using `$.runtime.tags.aws-sdk >= 1`
 ```
 res, err := sns.Publish(params)
 if err != nil {
-    log.Error("error occured in sns.Publish: %s", err).WithType("aws-sdk-error")
-    // {"severity":"ERROR","message":"error occured in sns.Publish: xxxx","time":"2019-04-27T20:12:20.5370358Z","filename":"/yourcode/main.go","fileline":80,"funcname":"main.handler","type": "aws-sdk-error"}
+    log.Error("error occured in sns.Publish: %s", err).WithTags("aws-sdk-error")
+    // {"severity":"ERROR","message":"error occured in sns.Publish: xxxx","time":"2019-04-27T20:12:20.5370358Z","filename":"/yourcode/main.go","fileline":80,"funcname":"main.handler","tags": ["aws-sdk-error"]}
     return err
 }
 ```

@@ -9,25 +9,23 @@ import (
 )
 
 type Logger struct {
-	Config        *Config
-	LogRequest    *LogRequest
-	SeverityCount *SeverityCount
+	Config     *Config
+	LogRequest *LogRequest
 }
 
 func NewLogger(ctx context.Context, c *Config) *Logger {
 	lr := &LogRequest{
 		Type:    c.Type,
 		Context: NewLogContext(ctx),
-		Runtime: &LogRuntime{},
+		Runtime: NewLogRuntime(),
 		Config: &LogConfig{
 			ElapsedUnit: c.ElapsedUnit.String(),
 		},
 	}
 
 	l := &Logger{
-		Config:        c,
-		LogRequest:    lr,
-		SeverityCount: &SeverityCount{},
+		Config:     c,
+		LogRequest: lr,
 	}
 	return l
 }
@@ -44,12 +42,23 @@ func (l *Logger) Start() func() {
 		l.Finish()
 	}
 }
-func (l *Logger) Finish() {
+
+func (l *Logger) FillInRuntimeMetadata() {
 	lr := l.LogRequest.Runtime
+
 	lr.EndTime = time.Now()
 	elapsed := lr.EndTime.Sub(lr.StartTime)
 	lr.Elapsed = int64(elapsed / l.Config.ElapsedUnit)
-	lr.Severity = l.SeverityCount.HighestSeverity().String()
+
+	for _, line := range lr.Lines {
+		lr.Tags.CountUp(line.Tags...)
+		lr.Severities.CountUp(line.Severity)
+	}
+	lr.Severity = lr.Severities.HighestSeverity()
+}
+
+func (l *Logger) Finish() {
+	l.FillInRuntimeMetadata()
 	var logline []byte
 	if l.Config.JsonIndent {
 		logline, _ = json.MarshalIndent(l.LogRequest, "", "  ")
@@ -62,7 +71,7 @@ func (l *Logger) Finish() {
 func (l *Logger) Record(severity Severity, message string) *LogEntry {
 	funcname, filename, fileline := FileInfo(3)
 	e := &LogEntry{
-		Severity: severity.String(),
+		Severity: severity,
 		Message:  message,
 		Time:     time.Now(),
 		Filename: filename,
@@ -70,7 +79,6 @@ func (l *Logger) Record(severity Severity, message string) *LogEntry {
 		Funcname: funcname,
 	}
 	l.LogRequest.Runtime.AppendLogEntry(e)
-	l.SeverityCount.CountUp(severity)
 	return e
 }
 
