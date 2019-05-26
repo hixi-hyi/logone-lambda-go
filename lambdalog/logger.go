@@ -69,12 +69,13 @@ func (l *Logger) Finish() {
 }
 
 func (l *Logger) Record(severity Severity, message string) *LogEntry {
-	funcname, filename, fileline := FileInfo(3)
+	funcname, _, fileline := FileInfo(3)
 	e := &LogEntry{
 		Severity: severity,
 		Message:  message,
 		Time:     time.Now(),
-		Filename: filename,
+		//Filename: filename,
+		//It is commented out because the filename of the build environment is displayed.
 		Fileline: fileline,
 		Funcname: funcname,
 	}
