@@ -29,6 +29,7 @@ func handler(ctx context.Context, req events.CloudWatchEvent) (interface{}, erro
     return nil, nil
 }
 ```
+If there is a possibility that `panic()` will occur, call `finish()` using the `recover ()` statement.
 
 ### Using nested function
 ```
