@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  Example:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 60
+      CodeUri: bin/
+      Handler: lambda
+      Runtime: go1.x
+      Tracing: Active
+      FunctionName: example-logone-lambda-go
