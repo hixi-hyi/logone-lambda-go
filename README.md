@@ -71,7 +71,14 @@ if err != nil {
 You can add an annotation to the log to get more details.
 The `Attributes` value must be defined as a type that can be JSON.Marshal. If you want to output value that cannot be JSON.Marshal, you use fmt.Sprintf or primitive type. (e.g. error is not struct or primitive type, you must use fmt.Sprintf("%s", err) or err.Error())
 ```
-log.Info("publish successfully).WithArrtibutes(res)
+log.Info("publish successfully").WithArrtibutes(res)
+```
+### With Error
+You can add an annotation to the log to get more details.
+```
+if err != nil {
+    log.Critical("error occured").WithError(err)
+}
 ```
 
 ## Outputs

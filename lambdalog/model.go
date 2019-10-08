@@ -19,6 +19,7 @@ type LogEntry struct {
 	Tags       []string    `json:"tags,omitempty"`
 	Elapsed    float64     `json:"elapsed,omitempty"`
 	Attributes interface{} `json:"attributes,omitempty"`
+	Error      string      `json:"error,omitempty"`
 }
 
 func (lr *LogEntry) WithTags(tags ...string) *LogEntry {
@@ -28,6 +29,13 @@ func (lr *LogEntry) WithTags(tags ...string) *LogEntry {
 
 func (lr *LogEntry) WithAttributes(i interface{}) *LogEntry {
 	lr.Attributes = i
+	return lr
+}
+
+func (lr *LogEntry) WithError(err error) *LogEntry {
+	if err != nil {
+		lr.Error = err.Error()
+	}
 	return lr
 }
 
